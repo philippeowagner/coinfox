@@ -314,7 +314,7 @@ class App extends Component {
 
       document.body.removeChild(element);
     }
-    download('coinfox_holdings.txt', localStorage );
+    download('coinfox_holdings.json', localStorage );
   }
 
   _updateLocalWithSave(e){
@@ -334,6 +334,53 @@ class App extends Component {
     }
 
     location.reload();
+
+  }
+
+
+
+
+
+  _updateLocalFromRemoteWithSave(e){
+    // https://stackoverflow.com/a/43268098/485361 for CORS
+    e.preventDefault();
+
+
+    const endpoint_inf = 'http://inflexion.ch/19823812398123708917238012308912/coinfox_holdings.json';
+
+
+    var proxyUrl = 'https://cors-anywhere.herokuapp.com/',
+     targetUrl = endpoint_inf;
+    fetch(proxyUrl + targetUrl)
+    .then(blob => blob.json())
+    .then(data => {
+
+
+
+        //const saveToLocalStorage = data;
+
+        const coinz = data.coinz;
+        const pref = data.pref;
+
+        if (coinz) {
+          localStorage.setItem('coinz', JSON.stringify(coinz));
+        } else {
+          alert("Something is wrong ... try it again.");
+        }
+        if (pref) {
+          localStorage.setItem('pref', JSON.stringify(pref));
+        }
+        location.reload();
+
+
+    })
+    .catch(e => {
+    console.log(e);
+    return e;
+    });
+
+
+
 
   }
 
@@ -431,6 +478,18 @@ class App extends Component {
               <input className="" type="submit" value="Save"/>
             </form>
 
+
+            <br/><br/>
+            or load from remote.
+            <br/>
+            <form className="" onSubmit={this._updateLocalFromRemoteWithSave}>
+              <input type="text"
+                className="coinfox_holdings"
+                onChange={this._onChange}
+                value={this.state.coinfox_holdings}
+                placeholder="Paste remote URL here"/>
+              <input className="" type="submit" value="Save"/>
+            </form>
 
 
         </div>
